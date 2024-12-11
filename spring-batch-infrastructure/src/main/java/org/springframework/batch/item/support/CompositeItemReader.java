@@ -34,7 +34,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 
 	private final List<ItemStreamReader<? extends T>> delegates;
 
-	private final Iterator<ItemStreamReader<? extends T>> delegatesIterator;
+	private Iterator<ItemStreamReader<? extends T>> delegatesIterator;
 
 	private ItemStreamReader<? extends T> currentDelegate;
 
@@ -44,14 +44,14 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 	 */
 	public CompositeItemReader(List<ItemStreamReader<? extends T>> delegates) {
 		this.delegates = delegates;
-		this.delegatesIterator = this.delegates.iterator();
-		this.currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
 	}
 
 	// TODO: check if we need to open/close delegates on the fly in read() to avoid
 	// opening resources early for a long time
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
+		this.delegatesIterator = this.delegates.iterator();
+		this.currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
 		for (ItemStreamReader<? extends T> delegate : delegates) {
 			delegate.open(executionContext);
 		}
